@@ -8,20 +8,7 @@ enum : std::uint16_t {
     Air,
     Dirt,
     Grass,
-    Stone,
-
-    //ITEMS
-    WoodenSword = 16384,
-    WoodenPickaxe,
-    WoodenAxe
+    Stone
 };
 
-[[nodiscard]] constexpr bool isTile(std::uint16_t value) noexcept {
-    return static_cast<std::uint16_t>(value) < 16384;
-}
-
-[[nodiscard]] constexpr bool isItem(std::uint16_t value) noexcept {
-    return static_cast<std::uint16_t>(value) >= 16384;
-}
-
-} //namespace ne::Asset
+} //namespace ne::Assets
