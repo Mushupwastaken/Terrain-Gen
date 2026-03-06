@@ -4,21 +4,6 @@
 #include "ChunkConfig.hpp"
 
 
-//Using templates could fix the fallbacks of this function (recomputation)
-//Making it natively store the inputted type and casting from there would improve aswell
-
-//Eg:
-/*
-
-template <typename T>
-class GridPosition {
-    //fromWorld sets stored to sf::Vector2f, else-wise, sf::Vector2i
-
-};
-
-*/
-
-
 namespace ne {
 
 class GridPosition {
@@ -63,5 +48,6 @@ public:
         };
     }
 };
+
 
 } //namespace ne
