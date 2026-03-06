@@ -10,20 +10,20 @@ namespace ne {
 
 namespace detail {
 
-//AI ass function (debug, leave it be)
 sf::Color getAssetColor(std::uint16_t value) {
     constexpr static float phi = 0.618033988749895f;
+
+    const float hue = std::fmod(static_cast<float>(value) * phi, 1.0f);
     
-    
-    const float h = std::fmod(static_cast<float>(value) * phi, 1.0f);
-    
-    auto f = [h](float n) -> std::uint8_t {
-        float k = std::fmod(n + h * 6.0f, 6.0f);
-        float color = 0.5f + 0.5f * std::max(std::min({k - 3.0f, 9.0f - k, 1.0f}), -1.0f);
-        return static_cast<std::uint8_t>(255 * color);
+    auto asColor = [strongHue = hue * 6.0f](float offset) -> std::uint8_t {
+        const float k = std::fmod(offset + strongHue, 6.0f);
+        const float intensity = 0.5f + 0.5f * std::clamp(std::min(k - 3.0f, 9.0f - k), -1.0f, 1.0f);
+        
+        return static_cast<std::uint8_t>(255 * intensity);
     };
 
-    return sf::Color(f(5), f(3), f(1));
+    // Offsets 5, 3, and 1 represent the R, G, and B channel positions
+    return sf::Color(asColor(5), asColor(3), asColor(1));
 }
 
 } //namespace detail
@@ -90,5 +90,6 @@ void drawVisibleChunks(sf::RenderWindow& window, ChunkManager& manager) {
         window.draw(*chunk->mesh, states);
     });
 }
+
 
 } //namespace ne
