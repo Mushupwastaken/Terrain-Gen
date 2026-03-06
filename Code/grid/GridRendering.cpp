@@ -13,10 +13,10 @@ namespace detail {
 sf::Color getAssetColor(std::uint16_t value) {
     constexpr static float phi = 0.618033988749895f;
 
-    const float hue = std::fmod(static_cast<float>(value) * phi, 1.0f);
+    const float hue = std::fmod(static_cast<float>(value) * phi, 1.0f) * 6.0f;
     
-    auto asColor = [strongHue = hue * 6.0f](float offset) -> std::uint8_t {
-        const float k = std::fmod(offset + strongHue, 6.0f);
+    auto asColor = [hue](float offset) -> std::uint8_t {
+        const float k = std::fmod(offset + hue, 6.0f);
         const float intensity = 0.5f + 0.5f * std::clamp(std::min(k - 3.0f, 9.0f - k), -1.0f, 1.0f);
         
         return static_cast<std::uint8_t>(255 * intensity);
@@ -93,3 +93,4 @@ void drawVisibleChunks(sf::RenderWindow& window, ChunkManager& manager) {
 
 
 } //namespace ne
+
