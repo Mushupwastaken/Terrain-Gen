@@ -1,16 +1,16 @@
 #pragma once
 
-//Might override std::hash for it, sounds much smarter ngl
 
-namespace ne::core {
-    
-struct Vector2iHash {
-    [[nodiscard]] std::size_t operator()(sf::Vector2i position) const noexcept {
-        return (static_cast<std::uint64_t>(position.x) << 32) | static_cast<std::uint32_t>(position.y);
+namespace std {
+
+template<typename T>
+struct hash<sf::Vector2<T>> {
+    std::size_t operator()(const sf::Vector2<T>& vec) const {
+        const size_t a = hash<T>{}(vec.x);
+        const size_t b = hash<T>{}(vec.y);
+        
+        return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
     }
-
-    static_assert(sizeof(sf::Vector2i) <= 8,    "sf::Vector2i is too large to pack into a 64-bit hash");
-    static_assert(sizeof(std::size_t) >= 8,     "Hash must return at minimum 64-bits");
 };
 
-} //namespace ne::core
+} //namespace std
