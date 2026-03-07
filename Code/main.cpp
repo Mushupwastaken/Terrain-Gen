@@ -2,6 +2,7 @@
 
 #include "grid/ChunkManager.hpp"
 #include "grid/GridRendering.hpp"
+#include "generation/ChunkGenerator.hpp"
 
 
 int main() {
@@ -47,5 +48,6 @@ int main() {
         window.display();
     }
 }
+
 
 
