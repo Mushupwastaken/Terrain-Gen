@@ -5,7 +5,7 @@ namespace std {
 
 template<typename T>
 struct hash<sf::Vector2<T>> {
-    std::size_t operator()(const sf::Vector2<T>& vec) const {
+    size_t operator()(const sf::Vector2<T>& vec) const {
         const size_t a = hash<T>{}(vec.x);
         const size_t b = hash<T>{}(vec.y);
         
@@ -14,3 +14,4 @@ struct hash<sf::Vector2<T>> {
 };
 
 } //namespace std
+
