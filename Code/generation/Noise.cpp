@@ -1,15 +1,15 @@
 #include "Noise.hpp"
-
+#include "core/IntMath.hpp"
 
 namespace ne {
 
 namespace detail {
 
-constexpr float getConstantVector1D(std::uint8_t value) {
+[[nodiscard]] constexpr float getConstantVector1D(std::uint8_t value) {
     return (value & 1) ? 1.0f : -1.0f;
 }
 
-constexpr sf::Vector2f getConstantVector2D(std::uint8_t value) {
+[[nodiscard]] constexpr sf::Vector2f getConstantVector2D(std::uint8_t value) {
     switch(value & 3)
     {
         case 0: return sf::Vector2f(1.0f, 1.0f);
@@ -21,36 +21,37 @@ constexpr sf::Vector2f getConstantVector2D(std::uint8_t value) {
     std::unreachable();
 };
 
-constexpr float fade(float t) {
+[[nodiscard]] constexpr float fade(float t) {
     return ((6 * t - 15) * t + 10) * t * t * t;
 };
 
 } //namespace detail
 
-float perlinNoise(const PermutationTable& table, float coord) {
-    int cellCoord = static_cast<int>(std::floor(coord)) & 255;
-    float fractionCoord = coord - std::floor(coord);
+float perlinNoise(const PermutationTable& table, float x) {
+    int flooredX = core::intFloor(x);
+    int cellX = flooredX & 255;
+    float fractionX = x - flooredX;
 
-    float distLeft = fractionCoord - 0.0f;
-    float distRight = fractionCoord - 1.0f;
+    float distLeft = fractionX - 0.0f;
+    float distRight = fractionX - 1.0f;
 
-    std::uint8_t valueLeft  = table[cellCoord];
-    std::uint8_t valueRight = table[cellCoord + 1];
+    std::uint8_t valueLeft  = table[cellX];
+    std::uint8_t valueRight = table[cellX + 1];
 
     //The LHS and RHS of a dot product is just multiplication
     float dotLeft = distLeft * detail::getConstantVector1D(valueLeft);
     float dotRight = distRight * detail::getConstantVector1D(valueRight);
 
-    float u = detail::fade(fractionCoord);
+    float u = detail::fade(fractionX);
     return std::lerp(dotLeft, dotRight, u);
 }
 
 float perlinNoise(const PermutationTable& table, sf::Vector2f pos) {
     //Copied impl from https://rtouti.github.io/graphics/perlin-noise-algorithm
-    int flooredX    = static_cast<int>(std::floor(pos.x));
-    int flooredY    = static_cast<int>(std::floor(pos.y));
-    int cellX       = flooredX % 255;
-    int cellY       = flooredY % 255;
+    int flooredX    = core::intFloor(pos.x);
+    int flooredY    = core::intFloor(pos.y);
+    int cellX       = flooredX & 255;
+    int cellY       = flooredY & 255;
     float fractionX = pos.x - flooredX;
     float fractionY = pos.y - flooredY;
 
