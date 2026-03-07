@@ -18,7 +18,7 @@ namespace ne {
 class ChunkManager {
 private:
     //Not using "GridPosition" because priv = sf::Vector2f
-    std::unordered_map<sf::Vector2i, std::unique_ptr<Chunk>, core::Vector2iHash> m_chunks;
+    std::unordered_map<sf::Vector2i, std::unique_ptr<Chunk>> m_chunks;
 public:
     void setChunk(Chunk chunk, GridPosition pos);
     void setTile(Tile tile, GridPosition pos);
@@ -130,5 +130,6 @@ void ChunkManager::queryTiles(this auto&& self, GridArea area, Func&& callback) 
         }
     });
 }
+
 
 } //namespace ne
