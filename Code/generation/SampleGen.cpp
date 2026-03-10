@@ -3,7 +3,7 @@
 
 namespace ne {
 
-std::mt19937 gen{230498};
+std::mt19937 gen{__LINE__};
 PermutationTable table(gen);
 
 Chunk generateChunk(GridPosition pos) {
@@ -13,23 +13,23 @@ Chunk generateChunk(GridPosition pos) {
     int minHeight = std::numeric_limits<int>::max();
     int maxHeight = std::numeric_limits<int>::min();
 
-    for(auto [localX, height] : heights | std::views::enumerate)
+    for(int x=0; x<constants::chunkSize; x++)
     {
-        const float noiseValue = perlinNoise(table, (currentTilePos.x + localX) * 0.10f);
-        height = static_cast<int>(noiseValue * 5.0f);
+        const float noiseValue = perlinNoise(table, (currentTilePos.x + x) * 0.10f);
+        heights[x] = static_cast<int>(noiseValue * 5.0f);
         
-        if(height < minHeight)
+        if(heights[x] < minHeight)
         {
-            minHeight = height;
+            minHeight = heights[x];
         }
-        else if(height > maxHeight)
+        else if(heights[x] > maxHeight)
         {
-            maxHeight = height;
+            maxHeight = heights[x];
         }
     }
     
     Chunk chunk;
-    chunk.tiles.fill({Assets::Air, 0});
+    chunk.tiles.fill({Tiles::Air, 0});
 
     for(int y = 0; y < constants::chunkSize; y++)
     {
@@ -47,18 +47,18 @@ Chunk generateChunk(GridPosition pos) {
 
                 if(noiseA + noiseB < 0.125f)
                 {
-                    chunk.tiles[index].value = Assets::Stone;
+                    chunk.tiles[index].value = Tiles::Stone;
                 }
             }
             else if(globalTilePos.y > maxHeight + heights[x] + 3)
             {
                 //Stone
-                chunk.tiles[index].value = Assets::Stone;
+                chunk.tiles[index].value = Tiles::Stone;
             }
             else if(globalTilePos.y > heights[x])
             {
                 //Grass
-                chunk.tiles[index].value = Assets::Grass;
+                chunk.tiles[index].value = Tiles::Dirt;
             }
         }
     }
