@@ -9,8 +9,6 @@
 #include "GridArea.hpp"
 
 
-//Querying is fine like this, the progb
-
 namespace ne {
 
 class ChunkManager {
@@ -18,7 +16,7 @@ private:
     //Not using "GridPosition" because priv = sf::Vector2f
     std::unordered_map<sf::Vector2i, std::unique_ptr<Chunk>> m_chunks;
 
-    //For caching getChunk -> important for constant use
+    //For caching getChunk - important for constant use
     Chunk* m_lastChunkPtr = nullptr; 
     sf::Vector2i m_lastChunkPos;
 public:
@@ -153,3 +151,4 @@ void ChunkManager::queryTiles(this auto&& self, GridArea area, Func&& callback) 
 }
 
 } //namespace ne
+
