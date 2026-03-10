@@ -1,40 +1,40 @@
 #include "GridRendering.hpp"
-
 #include "Config.hpp"
-#include "Assets.hpp"
-
-#include <iosfwd>
 
 
 namespace ne {
 
 namespace detail {
 
+inline std::array<sf::Vertex, constants::chunkExtent * 6> vertices;
+
+//AI ass function (debug, leave it be)
 sf::Color getAssetColor(std::uint16_t value) {
-    constexpr static float phi = 0.618033988749895f;
-
-    const float hue = std::fmod(static_cast<float>(value) * phi, 1.0f) * 6.0f;
+    using namespace Tiles;
     
-    auto asColor = [hue](float offset) -> std::uint8_t {
-        const float k = std::fmod(offset + hue, 6.0f);
-        const float intensity = 0.5f + 0.5f * std::clamp(std::min(k - 3.0f, 9.0f - k), -1.0f, 1.0f);
-        
-        return static_cast<std::uint8_t>(255 * intensity);
-    };
+    switch(value) 
+    {
+        case Air:
+            return sf::Color(0x00BFFFFF);
+        case Grass:
+            return sf::Color(0x00FF08FF);
+        case Dirt:
+            return sf::Color(0xA52A2AFF);
+        case Stone:
+            return sf::Color(0x808080FF); 
+    }
 
-    // Offsets 5, 3, and 1 represent the R, G, and B channel positions
-    return sf::Color(asColor(5), asColor(3), asColor(1));
+    return sf::Color::White;
 }
 
 } //namespace detail
 
 void updateChunkMesh(Chunk& chunk) {
-    static std::array<sf::Vertex, constants::chunkExtent * 6> vertices;
     std::size_t vertexCount{0};
 
     for(auto [index, tile] : chunk.tiles | std::views::enumerate)
     {
-        if(tile.value == Assets::None)
+        if(tile.value == Tiles::None)
         {
             continue;
         }
@@ -43,13 +43,13 @@ void updateChunkMesh(Chunk& chunk) {
         const sf::Color color = detail::getAssetColor(tile.value);
 
         //Apply triangles to array
-        vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 0, y + 0) * constants::renderScale, color);
-        vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 1, y + 0) * constants::renderScale, color);
-        vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 0, y + 1) * constants::renderScale, color);
+        detail::vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 0, y + 0) * constants::renderScale, color);
+        detail::vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 1, y + 0) * constants::renderScale, color);
+        detail::vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 0, y + 1) * constants::renderScale, color);
         
-        vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 1, y + 0) * constants::renderScale, color);
-        vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 1, y + 1) * constants::renderScale, color);
-        vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 0, y + 1) * constants::renderScale, color);
+        detail::vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 1, y + 0) * constants::renderScale, color);
+        detail::vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 1, y + 1) * constants::renderScale, color);
+        detail::vertices[vertexCount++] = sf::Vertex(sf::Vector2f(x + 0, y + 1) * constants::renderScale, color);
     }
 
     if(!chunk.mesh)
@@ -58,7 +58,7 @@ void updateChunkMesh(Chunk& chunk) {
         std::ignore = chunk.mesh->create(vertexCount);
     }
 
-    std::ignore = chunk.mesh->update(vertices.data(), vertexCount, 0);
+    std::ignore = chunk.mesh->update(detail::vertices.data(), vertexCount, 0);
 }
 
 void drawVisibleChunks(sf::RenderWindow& window, ChunkManager& manager) {
@@ -71,8 +71,8 @@ void drawVisibleChunks(sf::RenderWindow& window, ChunkManager& manager) {
     const GridArea chunkArea = GridArea::fromWorld(windowRect);
 
     //Query chunks in area, and update / render as required
-    manager.queryChunks(chunkArea, [&](Chunk* chunk, const GridPosition position) {
-        if(chunk == nullptr)
+    manager.queryChunks(chunkArea, [&](Chunk* chunkPtr, const GridPosition position) {
+        if(!chunkPtr)
         {
             return;
         }
@@ -81,17 +81,14 @@ void drawVisibleChunks(sf::RenderWindow& window, ChunkManager& manager) {
         states.transform.translate(position.asWorld());
         //states.texture = &texture;
 
-        if(chunk->updateMesh)
+        if(chunkPtr->isDirty)
         {
-            chunk->updateMesh = false;
-            updateChunkMesh(*chunk);
+            chunkPtr->isDirty = false;
+            updateChunkMesh(*chunkPtr);
         }
 
-        window.draw(*chunk->mesh, states);
+        window.draw(*chunkPtr->mesh, states);
     });
 }
 
-
 } //namespace ne
-
-
