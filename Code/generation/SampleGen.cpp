@@ -1,4 +1,7 @@
 #include "SampleGen.hpp"
+#include "grid/Config.hpp"
+
+#include <random>
 
 
 namespace ne {
