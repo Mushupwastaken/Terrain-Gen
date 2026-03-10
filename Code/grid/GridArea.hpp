@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/IntMath.hpp"
-#include "ChunkConfig.hpp"
+#include "Config.hpp"
 
 
 namespace ne {
@@ -27,8 +27,8 @@ public:
 
     static constexpr GridArea fromChunk(sf::IntRect area) {
         return GridArea({
-            sf::Vector2f(area.position * constants::chunkSize) * constants::renderScale,
-            sf::Vector2f(area.size * constants::chunkSize) * constants::renderScale
+            sf::Vector2f(area.position) * constants::renderScale * static_cast<float>(constants::chunkSize),
+            sf::Vector2f(area.size) * constants::renderScale * static_cast<float>(constants::chunkSize)
         });
     }
 
@@ -39,8 +39,8 @@ public:
     constexpr sf::IntRect asTile() const {
         const auto [pos, size] = m_worldArea;
 
-        const sf::Vector2f minEdge = pos * constants::invRenderScale;
-        const sf::Vector2f maxEdge = (pos + size) * constants::invRenderScale;
+        const sf::Vector2f minEdge = pos / constants::renderScale;
+        const sf::Vector2f maxEdge = (pos + size) / constants::renderScale;
 
         const sf::Vector2i minIndex{ 
             core::intFloor(minEdge.x), 
@@ -58,8 +58,8 @@ public:
     constexpr sf::IntRect asChunk() const {
         const auto [pos, size] = m_worldArea;
 
-        const sf::Vector2f minEdge = pos * constants::invChunkSize * constants::invRenderScale;
-        const sf::Vector2f maxEdge = (pos + size) * constants::invChunkSize * constants::invRenderScale;
+        const sf::Vector2f minEdge = pos / constants::renderScale / static_cast<float>(constants::chunkSize);
+        const sf::Vector2f maxEdge = (pos + size) / constants::renderScale / static_cast<float>(constants::chunkSize);
 
         const sf::Vector2i minIndex{ 
             core::intFloor(minEdge.x), 
