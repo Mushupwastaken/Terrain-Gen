@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ChunkConfig.hpp"
+#include "Config.hpp"
 #include "Tile.hpp"
 
 #include <entt/fwd.hpp>
@@ -10,8 +10,8 @@ namespace ne {
 
 struct Chunk {    
     std::array<Tile, constants::chunkExtent> tiles;    
-    std::unique_ptr<sf::VertexBuffer> mesh{nullptr};
-    bool updateMesh{true};
+    std::unique_ptr<sf::VertexBuffer> mesh = nullptr;
+    bool updateMesh = true;
     
     static constexpr sf::Vector2i toPosition(std::size_t index) {
         return sf::Vector2i{
@@ -26,5 +26,6 @@ struct Chunk {
 };
 
 } //namespace ne::grid
+
 
 
