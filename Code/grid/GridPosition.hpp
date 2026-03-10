@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/IntMath.hpp"
-#include "ChunkConfig.hpp"
+#include "Config.hpp"
 
 
 namespace ne {
@@ -23,7 +23,7 @@ public:
     }
 
     static constexpr GridPosition fromChunk(sf::Vector2i pos) {
-        return GridPosition(sf::Vector2f(pos * constants::chunkSize) * constants::renderScale);
+        return GridPosition(sf::Vector2f(pos) * constants::renderScale * static_cast<float>(constants::chunkSize));
     }
 
     constexpr sf::Vector2f asWorld() const {
@@ -31,23 +31,22 @@ public:
     }
 
     constexpr sf::Vector2i asTile() const {
-        sf::Vector2f pos = m_worldPos * constants::invRenderScale;
+        const sf::Vector2f pos = m_worldPos / constants::renderScale;
         
-        return sf::Vector2i{
+        return sf::Vector2i{ 
             core::intFloor(pos.x), 
-            core::intFloor(pos.y)
+            core::intFloor(pos.y) 
         };
     }
 
     constexpr sf::Vector2i asChunk() const {
-        sf::Vector2f pos = m_worldPos * constants::invChunkSize * constants::invRenderScale;
-        
+        const sf::Vector2f pos = m_worldPos / constants::renderScale / static_cast<float>(constants::chunkSize);
+
         return sf::Vector2i{
             core::intFloor(pos.x),
             core::intFloor(pos.y)
         };
     }
 };
-
 
 } //namespace ne
