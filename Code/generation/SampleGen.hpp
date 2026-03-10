@@ -2,12 +2,10 @@
 
 #include "PermutationTable.hpp"
 #include "Noise.hpp"
-#include <random>
 
-
-#include "grid/Assets.hpp"
-#include "grid/ChunkConfig.hpp"
 #include "grid/Chunk.hpp"
+#include "grid/ChunkManager.hpp"
+
 #include "grid/GridPosition.hpp"
 #include "grid/GridArea.hpp"
 
