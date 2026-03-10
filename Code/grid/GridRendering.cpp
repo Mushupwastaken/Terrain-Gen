@@ -1,6 +1,6 @@
 #include "GridRendering.hpp"
 
-#include "ChunkConfig.hpp"
+#include "Config.hpp"
 #include "Assets.hpp"
 
 #include <iosfwd>
@@ -93,4 +93,5 @@ void drawVisibleChunks(sf::RenderWindow& window, ChunkManager& manager) {
 
 
 } //namespace ne
+
 
