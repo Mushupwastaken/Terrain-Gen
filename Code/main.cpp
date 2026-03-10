@@ -65,6 +65,7 @@ int main() {
 
         ne::visibleChunkGenerator(window, manager);
         
+        //Sample showcasing how easy it is to apply properties to tiles
 
         const sf::Vector2i windowSize{window.getSize()};
     
@@ -74,7 +75,6 @@ int main() {
         const sf::FloatRect windowRect{topLeft, bottomRight - topLeft};
         const ne::GridArea chunkArea = ne::GridArea::fromWorld(windowRect);
         
-        //Sample showcasing how easy it is to apply properties to tiles
         manager.queryTiles(chunkArea, [&](ne::Tile& tile, ne::GridPosition pos) {            
             if(tile.value == ne::Tiles::Dirt)
             {
@@ -98,3 +98,4 @@ int main() {
         window.display();
     }
 }
+
