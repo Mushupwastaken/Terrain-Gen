@@ -1,68 +1,71 @@
 #include "SampleGen.hpp"
 #include "grid/Config.hpp"
 
-#include <random>
+#include <random>   
 
 
 namespace ne {
 
-std::mt19937 gen{__LINE__};
-PermutationTable table(gen);
+namespace detail {
+
+std::mt19937 gen{305050};
+PermutationTable pTable(gen);
+
+} //namespace detail
 
 Chunk generateChunk(GridPosition pos) {
-    const sf::Vector2i currentTilePos = pos.asTile();
+    const sf::Vector2i globalTilePos = pos.asTile();
 
-    std::array<int, constants::chunkSize> heights{};
+    //This is stupid -> heightmap calculation
+    std::array<int, constants::chunkSize> heightMap{};
     int minHeight = std::numeric_limits<int>::max();
     int maxHeight = std::numeric_limits<int>::min();
 
-    for(int x=0; x<constants::chunkSize; x++)
+    for(int x = 0; x < constants::chunkSize; x++)
     {
-        const float noiseValue = perlinNoise(table, (currentTilePos.x + x) * 0.10f);
-        heights[x] = static_cast<int>(noiseValue * 5.0f);
+        const float noiseValue = perlinNoise(detail::pTable, (globalTilePos.x + x) * 0.10f);
+        heightMap[x] = static_cast<int>(noiseValue * 5.0f);
         
-        if(heights[x] < minHeight)
+        if(heightMap[x] < minHeight)
         {
-            minHeight = heights[x];
+            minHeight = heightMap[x];
         }
-        else if(heights[x] > maxHeight)
+        else if(heightMap[x] > maxHeight)
         {
-            maxHeight = heights[x];
+            maxHeight = heightMap[x];
         }
     }
     
+    //Actual chunk generation
     Chunk chunk;
-    chunk.tiles.fill({Tiles::Air, 0});
+    chunk.tiles.fill({Tiles::Air});
 
-    for(int y = 0; y < constants::chunkSize; y++)
+    for(auto [index, tile] : chunk.tiles | std::views::enumerate)
     {
-        for(int x = 0; x < constants::chunkSize; x++)
-        {
-            sf::Vector2i localTilePos = {x, y};
-            sf::Vector2i globalTilePos = currentTilePos + localTilePos;
-            std::size_t index = Chunk::toIndex(localTilePos);
-            
-            if(globalTilePos.y > maxHeight + heights[x] + 6)
-            {
-                //Stone with caves
-                float noiseA = perlinNoise(table, sf::Vector2f(globalTilePos) * 0.08f);
-                float noiseB = perlinNoise(table, sf::Vector2f(globalTilePos) * 0.11f);
+        sf::Vector2i localPos = Chunk::toPosition(index);
+        sf::Vector2i worldPos = globalTilePos + localPos;
 
-                if(noiseA + noiseB < 0.125f)
-                {
-                    chunk.tiles[index].value = Tiles::Stone;
-                }
-            }
-            else if(globalTilePos.y > maxHeight + heights[x] + 3)
+        if(worldPos.y > maxHeight + heightMap[localPos.x] + 6)
+        {
+            //Stone with caves
+            sf::Vector2f worldPosf{worldPos};
+            const float noiseA = perlinNoise(detail::pTable, worldPosf * 0.08f);
+            const float noiseB = perlinNoise(detail::pTable, worldPosf * 0.11f);
+            
+            if(noiseA + noiseB < 0.125f)
             {
-                //Stone
-                chunk.tiles[index].value = Tiles::Stone;
+                tile.value = Tiles::Stone;
             }
-            else if(globalTilePos.y > heights[x])
-            {
-                //Grass
-                chunk.tiles[index].value = Tiles::Dirt;
-            }
+        }
+        else if(worldPos.y > maxHeight + heightMap[localPos.x] + 3)
+        {
+            //Stone
+            tile.value = Tiles::Stone;
+        }
+        else if(worldPos.y > heightMap[localPos.x])
+        {
+            //Grass
+            tile.value = Tiles::Dirt;
         }
     }
 
