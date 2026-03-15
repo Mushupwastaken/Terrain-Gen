@@ -8,7 +8,6 @@ namespace detail {
 
 inline std::array<sf::Vertex, constants::chunkExtent * 6> vertices;
 
-//AI ass function (debug, leave it be)
 sf::Color getAssetColor(std::uint16_t value) {
     using namespace Tiles;
     
