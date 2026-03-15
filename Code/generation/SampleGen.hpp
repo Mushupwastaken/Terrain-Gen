@@ -11,13 +11,8 @@
 
 #include "grid/ChunkManager.hpp"
 
-//This is lazily programmed, used for showcasing the engines power, and ease of use.
-//Additional dependencies, like Noise are used similarly.
-
 namespace ne {
 
-Chunk generateChunk(GridPosition pos);
-
-void debugGenerator(sf::RenderWindow& window, ChunkManager& manager);
+[[nodiscard]] Chunk generateChunk(GridPosition pos);
 
 } //namespace ne
